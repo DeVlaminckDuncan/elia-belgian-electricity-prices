@@ -39,9 +39,9 @@ function App() {
     };
 
     fetchAllPrices();
-    
-    // Refresh data every hour
-    const interval = setInterval(fetchAllPrices, 3600000);
+
+    // Refresh data every 15 seconds
+    const interval = setInterval(fetchAllPrices, 15 * 1000);
     return () => clearInterval(interval);
   }, []);
 
