@@ -25,12 +25,12 @@ export const PriceTable: React.FC<PriceTableProps> = ({ prices, title }) => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {prices.map((price) => (
-              <tr key={price.DateTime}>
+              <tr key={price.dateTime}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatDateTime(price.DateTime)}
+                  {formatDateTime(price.dateTime)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatPrice(price.Price)}
+                  {formatPrice(price.price)}
                 </td>
               </tr>
             ))}
