@@ -14,6 +14,7 @@ function App() {
   const [tomorrowPrices, setTomorrowPrices] = useState<ElectricityPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const currentPrice = getCurrentPrice(todayPrices);
 
   useEffect(() => {
     const fetchAllPrices = async () => {
@@ -87,9 +88,19 @@ function App() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          <PriceTable prices={yesterdayPrices} title="Yesterday's Prices" />
-          <PriceTable prices={todayPrices} title="Today's Prices" />
-          <PriceTable prices={tomorrowPrices} title="Tomorrow's Prices" />
+          <PriceTable 
+            prices={yesterdayPrices} 
+            title="Yesterday's Prices" 
+          />
+          <PriceTable 
+            prices={todayPrices} 
+            title="Today's Prices" 
+            currentDateTime={currentPrice?.dateTime}
+          />
+          <PriceTable 
+            prices={tomorrowPrices} 
+            title="Tomorrow's Prices" 
+          />
         </div>
       </div>
     </div>

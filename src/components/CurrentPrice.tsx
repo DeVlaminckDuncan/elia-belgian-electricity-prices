@@ -1,7 +1,10 @@
 import React from 'react';
 import { ElectricityPrice } from '../types';
-import { formatPrice, getMinutesUntilNextHour, getPriceChangeIndicator } from '../utils/electricity';
-import { Zap, TrendingUp, TrendingDown } from 'lucide-react';
+import { formatPrice } from '../utils/formatting';
+import { getMinutesUntilNextHour } from '../utils/time';
+import { getPriceChangeIndicator } from '../utils/electricity';
+import { Zap } from 'lucide-react';
+import { PriceIndicator } from './PriceIndicator';
 
 interface CurrentPriceProps {
   currentPrice?: ElectricityPrice;
@@ -31,16 +34,10 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({ currentPrice, nextPr
               <div className="text-2xl font-semibold text-gray-800">
                 {formatPrice(nextPrice.price)}
               </div>
-              <div className={`flex items-center ${priceChange.direction === 'up' ? 'text-red-500' : 'text-green-500'}`}>
-                {priceChange.direction === 'up' ? (
-                  <TrendingUp className="w-5 h-5" />
-                ) : (
-                  <TrendingDown className="w-5 h-5" />
-                )}
-                <span className="text-sm ml-1">
-                  {priceChange.percentage.toFixed(1)}%
-                </span>
-              </div>
+              <PriceIndicator 
+                direction={priceChange.direction}
+                percentage={priceChange.percentage}
+              />
             </div>
             <div className="text-sm text-gray-500">
               Price {priceChange.direction === 'up' ? 'increases' : 'decreases'} in {minutesUntilChange} minute{minutesUntilChange !== 1 ? 's' : ''}
