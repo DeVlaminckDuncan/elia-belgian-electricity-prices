@@ -1,0 +1,21 @@
+export default {
+  translation: {
+    title: 'Prix de l\'Électricité Elia',
+    viewOnElia: 'Voir sur Elia',
+    currentPrice: 'Prix Actuel',
+    nextHour: 'Heure suivante',
+    priceIncreasesIn: 'Le prix augmente dans {{minutes}} minute',
+    priceIncreasesInPlural: 'Le prix augmente dans {{minutes}} minutes',
+    priceDecreasesIn: 'Le prix baisse dans {{minutes}} minute',
+    priceDecreasesInPlural: 'Le prix baisse dans {{minutes}} minutes',
+    noDataAvailable: 'Aucune donnée disponible',
+    time: 'Heure',
+    price: 'Prix',
+    change: 'Variation',
+    yesterdayPrices: 'Prix d\'Hier',
+    todayPrices: 'Prix d\'Aujourd\'hui',
+    tomorrowPrices: 'Prix de Demain',
+    loading: 'Chargement des prix de l\'électricité...',
+    error: 'Échec de la récupération des prix de l\'électricité. Veuillez réessayer plus tard.',
+  },
+};

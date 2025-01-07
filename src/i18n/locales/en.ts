@@ -1,0 +1,21 @@
+export default {
+  translation: {
+    title: 'Elia Electricity Prices',
+    viewOnElia: 'View on Elia',
+    currentPrice: 'Current Price',
+    nextHour: 'Next hour',
+    priceIncreasesIn: 'Price increases in {{minutes}} minute',
+    priceIncreasesInPlural: 'Price increases in {{minutes}} minutes',
+    priceDecreasesIn: 'Price decreases in {{minutes}} minute',
+    priceDecreasesInPlural: 'Price decreases in {{minutes}} minutes',
+    noDataAvailable: 'No data available',
+    time: 'Time',
+    price: 'Price',
+    change: 'Change',
+    yesterdayPrices: "Yesterday's Prices",
+    todayPrices: "Today's Prices",
+    tomorrowPrices: "Tomorrow's Prices",
+    loading: 'Loading electricity prices...',
+    error: 'Failed to fetch electricity prices. Please try again later.',
+  },
+};

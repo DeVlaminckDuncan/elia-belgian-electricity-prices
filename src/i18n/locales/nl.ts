@@ -1,0 +1,21 @@
+export default {
+  translation: {
+    title: 'Elia Elektriciteitsprijzen',
+    viewOnElia: 'Bekijk op Elia',
+    currentPrice: 'Huidige Prijs',
+    nextHour: 'Volgend uur',
+    priceIncreasesIn: 'Prijs stijgt over {{minutes}} minuut',
+    priceIncreasesInPlural: 'Prijs stijgt over {{minutes}} minuten',
+    priceDecreasesIn: 'Prijs daalt over {{minutes}} minuut',
+    priceDecreasesInPlural: 'Prijs daalt over {{minutes}} minuten',
+    noDataAvailable: 'Geen gegevens beschikbaar',
+    time: 'Tijd',
+    price: 'Prijs',
+    change: 'Wijziging',
+    yesterdayPrices: 'Prijzen Gisteren',
+    todayPrices: 'Prijzen Vandaag',
+    tomorrowPrices: 'Prijzen Morgen',
+    loading: 'Elektriciteitsprijzen laden...',
+    error: 'Fout bij het ophalen van elektriciteitsprijzen. Probeer het later opnieuw.',
+  },
+};
