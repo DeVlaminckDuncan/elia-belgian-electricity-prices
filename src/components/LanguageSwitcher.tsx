@@ -13,7 +13,7 @@ export const LanguageSwitcher: React.FC = () => {
 
   return (
     <div className="flex items-center space-x-2">
-      <Languages className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+      <Languages className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-400" />
       <select
         value={i18n.language}
         onChange={(e) => i18n.changeLanguage(e.target.value)}

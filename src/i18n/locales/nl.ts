@@ -17,5 +17,9 @@ export default {
     tomorrowPrices: 'Prijzen Morgen',
     loading: 'Elektriciteitsprijzen laden...',
     error: 'Fout bij het ophalen van elektriciteitsprijzen. Probeer het later opnieuw.',
+    priceChart: 'Prijsevolutie',
+    yesterday: 'Gisteren',
+    today: 'Vandaag',
+    tomorrow: 'Morgen',
   },
 };

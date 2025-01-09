@@ -10,18 +10,19 @@ interface PriceTableProps {
   prices: ElectricityPrice[];
   title: string;
   currentDateTime?: string;
+  highlight?: boolean;
 }
 
-export const PriceTable: React.FC<PriceTableProps> = ({ prices, title, currentDateTime }) => {
+export const PriceTable: React.FC<PriceTableProps> = ({ prices, title, currentDateTime, highlight }) => {
   const { t } = useTranslation();
   const stats = getPriceStats(prices);
 
   if (!prices.length) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4 dark:text-white">{title}</h2>
-        <div className="flex items-center justify-center p-8 text-gray-500 dark:text-gray-400">
-          <AlertCircle className="w-5 h-5 mr-2" />
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 dark:text-white">{title}</h2>
+        <div className="flex items-center justify-center p-4 sm:p-8 text-sm sm:text-base text-gray-500 dark:text-gray-400">
+          <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
           <span>{t('noDataAvailable')}</span>
         </div>
       </div>
@@ -29,59 +30,66 @@ export const PriceTable: React.FC<PriceTableProps> = ({ prices, title, currentDa
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4 dark:text-white">{title}</h2>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-gray-50 dark:bg-gray-700">
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                {t('time')}
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                {t('price')}
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                {t('change')}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {prices.map((price, index) => {
-              const priceDiff = calculatePriceDiffWithPrevious(price, prices[index - 1]);
-              const isCurrentHour = price.dateTime === currentDateTime;
-              const isMinPrice = stats?.min.price === price.price;
-              const isMaxPrice = stats?.max.price === price.price;
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 ${
+      highlight ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
+    }`}>
+      <h2 className={`text-lg sm:text-xl font-semibold mb-4 ${
+        highlight ? 'text-blue-600 dark:text-blue-400' : 'dark:text-white'
+      }`}>{title}</h2>
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <div className="inline-block min-w-full align-middle">
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-gray-50 dark:bg-gray-700">
+                <th className="px-3 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('time')}
+                </th>
+                <th className="px-3 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('price')}
+                </th>
+                <th className="px-3 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('change')}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {prices.map((price, index) => {
+                const priceDiff = calculatePriceDiffWithPrevious(price, prices[index - 1]);
+                const isCurrentHour = price.dateTime === currentDateTime;
+                const isMinPrice = stats?.min.price === price.price;
+                const isMaxPrice = stats?.max.price === price.price;
 
-              return (
-                <tr 
-                  key={price.dateTime}
-                  className={`
-                    ${isCurrentHour ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
-                    ${isMinPrice ? 'bg-green-50 dark:bg-green-900/20' : ''}
-                    ${isMaxPrice ? 'bg-red-50 dark:bg-red-900/20' : ''}
-                    hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors
-                  `}
-                >
-                  <td className="px-4 py-2 whitespace-nowrap text-sm dark:text-gray-300">
-                    {formatDateTime(price.dateTime)}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm font-medium dark:text-gray-300">
-                    {formatPrice(price.price)}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm">
-                    {priceDiff && (
-                      <PriceIndicator
-                        direction={priceDiff.direction}
-                        percentage={priceDiff.percentage}
-                      />
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr 
+                    key={price.dateTime}
+                    className={`
+                      ${isCurrentHour ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
+                      ${isMinPrice ? 'bg-green-50 dark:bg-green-900/20' : ''}
+                      ${isMaxPrice ? 'bg-red-50 dark:bg-red-900/20' : ''}
+                      hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-sm
+                    `}
+                  >
+                    <td className="px-3 sm:px-4 py-2 whitespace-nowrap dark:text-gray-300">
+                      {formatDateTime(price.dateTime)}
+                    </td>
+                    <td className="px-3 sm:px-4 py-2 whitespace-nowrap font-medium dark:text-gray-300">
+                      {formatPrice(price.price)}
+                    </td>
+                    <td className="px-3 sm:px-4 py-2 whitespace-nowrap">
+                      {priceDiff && (
+                        <PriceIndicator
+                          direction={priceDiff.direction}
+                          percentage={priceDiff.percentage}
+                          className="text-xs sm:text-sm"
+                        />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

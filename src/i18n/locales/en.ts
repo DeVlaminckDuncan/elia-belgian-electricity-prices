@@ -17,5 +17,9 @@ export default {
     tomorrowPrices: "Tomorrow's Prices",
     loading: 'Loading electricity prices...',
     error: 'Failed to fetch electricity prices. Please try again later.',
+    priceChart: 'Price Evolution',
+    yesterday: 'Yesterday',
+    today: 'Today',
+    tomorrow: 'Tomorrow',
   },
 };

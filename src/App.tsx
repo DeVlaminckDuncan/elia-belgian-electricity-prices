@@ -5,6 +5,7 @@ import { ElectricityPrice } from './types';
 import { fetchElectricityPrices } from './utils/api';
 import { PriceTable } from './components/PriceTable';
 import { CurrentPrice } from './components/CurrentPrice';
+import { PriceChart } from './components/PriceChart';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeToggle } from './components/ThemeToggle';
 import { normalizePrice, getHourlyPrices } from './utils/transformers';
@@ -66,47 +67,54 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             {t('title')}
           </h1>
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <ThemeToggle />
             <LanguageSwitcher />
             <a
               href="https://www.elia.be/en/grid-data/transmission/day-ahead-reference-price"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white text-sm sm:text-base rounded-md hover:bg-blue-700 transition-colors"
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className="w-4 h-4 mr-1 sm:mr-2" />
               {t('viewOnElia')}
             </a>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="w-full">
           <CurrentPrice
             currentPrice={getCurrentPrice(todayPrices)}
             nextPrice={getNextPrice(todayPrices)}
           />
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <PriceTable 
-            prices={yesterdayPrices} 
-            title={t('yesterdayPrices')} 
-          />
+        <PriceChart
+          yesterdayPrices={yesterdayPrices}
+          todayPrices={todayPrices}
+          tomorrowPrices={tomorrowPrices}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           <PriceTable 
             prices={todayPrices} 
             title={t('todayPrices')} 
             currentDateTime={currentPrice?.dateTime}
+            highlight={true}
           />
           <PriceTable 
             prices={tomorrowPrices} 
             title={t('tomorrowPrices')} 
+          />
+          <PriceTable 
+            prices={yesterdayPrices} 
+            title={t('yesterdayPrices')} 
           />
         </div>
       </div>

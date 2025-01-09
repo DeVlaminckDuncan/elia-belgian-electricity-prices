@@ -18,22 +18,22 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({ currentPrice, nextPr
   const priceChange = getPriceChangeIndicator(currentPrice, nextPrice);
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
       <div className="flex items-center space-x-2 mb-4">
-        <Zap className="w-6 h-6 text-yellow-500" />
-        <h2 className="text-xl font-semibold dark:text-white">{t('currentPrice')}</h2>
+        <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" />
+        <h2 className="text-lg sm:text-xl font-semibold dark:text-white">{t('currentPrice')}</h2>
       </div>
       
       <div className="space-y-4">
-        <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+        <div className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">
           {currentPrice ? formatPrice(currentPrice.price) : 'N/A'}
         </div>
         
         {nextPrice && priceChange && (
           <div className="space-y-2">
-            <div className="text-gray-600 dark:text-gray-400">{t('nextHour')}:</div>
+            <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{t('nextHour')}:</div>
             <div className="flex items-center space-x-2">
-              <div className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+              <div className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-200">
                 {formatPrice(nextPrice.price)}
               </div>
               <PriceIndicator 
@@ -41,7 +41,7 @@ export const CurrentPrice: React.FC<CurrentPriceProps> = ({ currentPrice, nextPr
                 percentage={priceChange.percentage}
               />
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               {t(
                 priceChange.direction === 'up'
                   ? minutesUntilChange === 1

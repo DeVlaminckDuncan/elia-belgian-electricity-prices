@@ -17,5 +17,9 @@ export default {
     tomorrowPrices: 'Prix de Demain',
     loading: 'Chargement des prix de l\'électricité...',
     error: 'Échec de la récupération des prix de l\'électricité. Veuillez réessayer plus tard.',
+    priceChart: 'Évolution des Prix',
+    yesterday: 'Hier',
+    today: 'Aujourd\'hui',
+    tomorrow: 'Demain',
   },
 };
