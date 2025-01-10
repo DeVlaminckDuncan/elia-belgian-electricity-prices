@@ -8,6 +8,7 @@ import { CurrentPrice } from './components/CurrentPrice';
 import { PriceChart } from './components/PriceChart';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeToggle } from './components/ThemeToggle';
+import { PriceUnitToggle } from './components/PriceUnitToggle';
 import { normalizePrice, getHourlyPrices } from './utils/transformers';
 import { getCurrentPrice, getNextPrice } from './utils/electricity';
 import { addDays, subDays } from 'date-fns';
@@ -19,6 +20,7 @@ function App() {
   const [tomorrowPrices, setTomorrowPrices] = useState<ElectricityPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [unit, setUnit] = useState<'MWh' | 'kWh'>('MWh');
   const currentPrice = getCurrentPrice(todayPrices);
 
   useEffect(() => {
@@ -67,22 +69,23 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+      <div className="max-w-7xl mx-auto space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             {t('title')}
           </h1>
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            <PriceUnitToggle unit={unit} onUnitChange={setUnit} />
             <ThemeToggle />
             <LanguageSwitcher />
             <a
               href="https://www.elia.be/en/grid-data/transmission/day-ahead-reference-price"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white text-sm sm:text-base rounded-md hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
             >
-              <ExternalLink className="w-4 h-4 mr-1 sm:mr-2" />
+              <ExternalLink className="w-4 h-4 mr-1" />
               {t('viewOnElia')}
             </a>
           </div>
@@ -92,29 +95,33 @@ function App() {
           <CurrentPrice
             currentPrice={getCurrentPrice(todayPrices)}
             nextPrice={getNextPrice(todayPrices)}
+            unit={unit}
           />
         </div>
 
         <PriceChart
-          yesterdayPrices={yesterdayPrices}
           todayPrices={todayPrices}
           tomorrowPrices={tomorrowPrices}
+          unit={unit}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <PriceTable 
             prices={todayPrices} 
             title={t('todayPrices')} 
             currentDateTime={currentPrice?.dateTime}
             highlight={true}
+            unit={unit}
           />
           <PriceTable 
             prices={tomorrowPrices} 
             title={t('tomorrowPrices')} 
+            unit={unit}
           />
           <PriceTable 
             prices={yesterdayPrices} 
             title={t('yesterdayPrices')} 
+            unit={unit}
           />
         </div>
       </div>
