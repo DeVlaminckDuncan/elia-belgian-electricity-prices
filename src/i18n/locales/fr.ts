@@ -1,6 +1,7 @@
 export default {
   translation: {
     title: 'Prix de l\'Électricité Elia',
+    pageTitle: 'Prix de l\'Électricité Belge | Elia',
     viewOnElia: 'Voir sur Elia',
     currentPrice: 'Prix Actuel',
     nextHour: 'Heure suivante',

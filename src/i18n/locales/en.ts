@@ -1,6 +1,7 @@
 export default {
   translation: {
     title: 'Elia Electricity Prices',
+    pageTitle: 'Belgian Electricity Prices | Elia',
     viewOnElia: 'View on Elia',
     currentPrice: 'Current Price',
     nextHour: 'Next hour',

@@ -14,7 +14,7 @@ import { getCurrentPrice, getNextPrice } from './utils/electricity';
 import { addDays, subDays } from 'date-fns';
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [todayPrices, setTodayPrices] = useState<ElectricityPrice[]>([]);
   const [yesterdayPrices, setYesterdayPrices] = useState<ElectricityPrice[]>([]);
   const [tomorrowPrices, setTomorrowPrices] = useState<ElectricityPrice[]>([]);
@@ -22,6 +22,10 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [unit, setUnit] = useState<'MWh' | 'kWh'>('MWh');
   const currentPrice = getCurrentPrice(todayPrices);
+
+  useEffect(() => {
+    document.title = t('pageTitle');
+  }, [t, i18n.language]);
 
   useEffect(() => {
     const fetchAllPrices = async () => {
