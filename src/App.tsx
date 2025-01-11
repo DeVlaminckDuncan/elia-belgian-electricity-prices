@@ -94,7 +94,7 @@ function App() {
         <div className="w-full">
           <CurrentPrice
             currentPrice={getCurrentPrice(todayPrices)}
-            nextPrice={getNextPrice(todayPrices)}
+            nextPrice={getNextPrice(todayPrices, tomorrowPrices)}
             unit={unit}
           />
         </div>
