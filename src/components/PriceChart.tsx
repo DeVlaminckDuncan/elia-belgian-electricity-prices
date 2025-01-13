@@ -101,6 +101,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({
               stroke="#6B7280"
               tickFormatter={(value) => `€${value}`}
               width={60}
+              domain={[80, 150]}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend iconType="circle" />
@@ -111,6 +112,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({
               stroke="#3B82F6"
               strokeWidth={2}
               dot={false}
+              isAnimationActive={false}
             />
             {tomorrowPrices.length > 0 && (
               <Line
@@ -120,6 +122,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({
                 stroke="#10B981"
                 strokeWidth={2}
                 dot={false}
+                isAnimationActive={false}
               />
             )}
           </LineChart>
