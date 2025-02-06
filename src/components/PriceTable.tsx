@@ -38,11 +38,11 @@ export const PriceTable: React.FC<PriceTableProps> = ({
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 ${
-      highlight ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
+      highlight === true ? 'ring-2 ring-blue-500 dark:ring-blue-400' : highlight === 'green' ? 'ring-2 ring-green-500 dark:ring-green-400' : ''
     }`}>
       <div className="flex items-center justify-between mb-4">
         <h2 className={`text-lg font-semibold ${
-          highlight ? 'text-blue-600 dark:text-blue-400' : 'dark:text-white'
+          highlight === true ? 'text-blue-600 dark:text-blue-400' : highlight === 'green' ? 'text-green-600 dark:text-green-400' : 'dark:text-white'
         }`}>{title}</h2>
         <div className="text-sm text-gray-600 dark:text-gray-400">{`€/${unit}`}</div>
       </div>
@@ -69,15 +69,23 @@ export const PriceTable: React.FC<PriceTableProps> = ({
                 const isMinPrice = stats?.min.price === price.price;
                 const isMaxPrice = stats?.max.price === price.price;
 
+                let bgClass = '';
+                if (isCurrentHour && (isMinPrice || isMaxPrice)) {
+                  bgClass = isMinPrice 
+                    ? 'bg-gradient-to-r from-blue-100 to-green-100 dark:from-blue-900/40 dark:to-green-900/40'
+                    : 'bg-gradient-to-r from-blue-100 to-red-100 dark:from-blue-900/40 dark:to-red-900/40';
+                } else if (isCurrentHour) {
+                  bgClass = 'bg-blue-100 dark:bg-blue-900/40';
+                } else if (isMinPrice) {
+                  bgClass = 'bg-green-100 dark:bg-green-900/40';
+                } else if (isMaxPrice) {
+                  bgClass = 'bg-red-100 dark:bg-red-900/40';
+                }
+
                 return (
                   <tr 
                     key={price.dateTime}
-                    className={`
-                      ${isCurrentHour ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
-                      ${isMinPrice ? 'bg-green-50 dark:bg-green-900/20' : ''}
-                      ${isMaxPrice ? 'bg-red-50 dark:bg-red-900/20' : ''}
-                      hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-sm
-                    `}
+                    className={`${bgClass} transition-colors text-sm`}
                   >
                     <td className="px-3 py-2 whitespace-nowrap dark:text-gray-300">
                       {formatDateTime(price.dateTime)}

@@ -20,12 +20,18 @@ function App() {
   const [tomorrowPrices, setTomorrowPrices] = useState<ElectricityPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [unit, setUnit] = useState<'MWh' | 'kWh'>('MWh');
+  const [unit, setUnit] = useState<'MWh' | 'kWh'>(() => {
+    return localStorage.getItem('priceUnit') as 'MWh' | 'kWh' || 'MWh';
+  });
   const currentPrice = getCurrentPrice(todayPrices);
 
   useEffect(() => {
     document.title = t('pageTitle');
   }, [t, i18n.language]);
+
+  useEffect(() => {
+    localStorage.setItem('priceUnit', unit);
+  }, [unit]);
 
   useEffect(() => {
     const fetchAllPrices = async () => {
@@ -120,6 +126,7 @@ function App() {
           <PriceTable 
             prices={tomorrowPrices} 
             title={t('tomorrowPrices')} 
+            highlight="green"
             unit={unit}
           />
           <PriceTable 
@@ -131,6 +138,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;

@@ -6,6 +6,7 @@ const languages = [
   { code: 'en-GB', name: 'English' },
   { code: 'nl-BE', name: 'Nederlands' },
   { code: 'fr-BE', name: 'Français' },
+  { code: 'de-DE', name: 'Deutsch' },
 ];
 
 export const LanguageSwitcher: React.FC = () => {

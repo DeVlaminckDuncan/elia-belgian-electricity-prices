@@ -22,5 +22,11 @@ export default {
     yesterday: 'Hier',
     today: 'Aujourd\'hui',
     tomorrow: 'Demain',
+    todayHighlights: 'Points Forts Aujourd\'hui',
+    tomorrowHighlights: 'Points Forts Demain',
+    todayMin: 'Min Aujourd\'hui',
+    todayMax: 'Max Aujourd\'hui',
+    tomorrowMin: 'Min Demain',
+    tomorrowMax: 'Max Demain',
   },
 };

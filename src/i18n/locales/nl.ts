@@ -22,5 +22,11 @@ export default {
     yesterday: 'Gisteren',
     today: 'Vandaag',
     tomorrow: 'Morgen',
+    todayHighlights: 'Hoogtepunten Vandaag',
+    tomorrowHighlights: 'Hoogtepunten Morgen',
+    todayMin: 'Min Vandaag',
+    todayMax: 'Max Vandaag',
+    tomorrowMin: 'Min Morgen',
+    tomorrowMax: 'Max Morgen',
   },
 };

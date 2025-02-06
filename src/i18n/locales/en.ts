@@ -22,5 +22,11 @@ export default {
     yesterday: 'Yesterday',
     today: 'Today',
     tomorrow: 'Tomorrow',
+    todayHighlights: "Today's Highlights",
+    tomorrowHighlights: "Tomorrow's Highlights",
+    todayMin: "Today's Min",
+    todayMax: "Today's Max",
+    tomorrowMin: "Tomorrow's Min",
+    tomorrowMax: "Tomorrow's Max",
   },
 };
