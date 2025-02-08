@@ -27,7 +27,7 @@ interface DotProps {
   };
 }
 
-const CustomDot: React.FC<DotProps & { key: string }> = ({ cx, cy, payload }) => {
+const CustomDot: React.FC<DotProps> = ({ cx, cy, payload }) => {
   if (!cx || !cy || !payload?.isCurrentHour) return null;
   
   return (
@@ -46,11 +46,10 @@ interface MinMaxDotProps extends DotProps {
   todayStats?: { min: ElectricityPrice; max: ElectricityPrice };
   tomorrowStats?: { min: ElectricityPrice; max: ElectricityPrice };
   unit: 'MWh' | 'kWh';
-  key: string;
   lineKey: string;
 }
 
-const MinMaxDot: React.FC<MinMaxDotProps> = ({ cx, cy, payload, todayStats, tomorrowStats, unit }) => {
+const MinMaxDot: React.FC<MinMaxDotProps> = ({ cx, cy, payload, todayStats, tomorrowStats, unit, lineKey }) => {
   if (!cx || !cy || !payload || !unit) return null;
 
   const isMinToday = todayStats && payload.today === convertPrice(todayStats.min.price, unit);
@@ -81,19 +80,19 @@ const renderDot = (props: DotProps, options: {
   lineKey: string
 }) => {
   const { todayStats, tomorrowStats, unit, lineKey } = options;
-  const { dataKey, index } = props;
+  const { dataKey, index, payload } = props;
 
   if (!dataKey || index === undefined) return null;
 
-  const currentKey = `${lineKey}-current-${index}`;
-  const minMaxKey = `${lineKey}-minmax-${index}`;
+  // Create unique keys using all available context
+  const uniqueId = `${lineKey}-${index}-${payload?.time}`;
 
   return (
-    <g key={`${lineKey}-group-${index}`}>
-      <CustomDot key={currentKey} {...props} />
+    <g key={uniqueId}>
+      <CustomDot {...props} key={`current-${uniqueId}`} />
       <MinMaxDot 
-        key={minMaxKey}
         {...props}
+        key={`minmax-${uniqueId}`}
         todayStats={todayStats}
         tomorrowStats={tomorrowStats}
         unit={unit}
@@ -239,7 +238,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
                 type="monotone"
                 dataKey="tomorrow"
                 name={t('tomorrow')}
-                stroke="#10B981"
+                stroke="#22C55E"
                 strokeWidth={2}
                 dot={(props) => renderDot(props as DotProps, { 
                   tomorrowStats,
@@ -259,4 +258,4 @@ const PriceChart: React.FC<PriceChartProps> = ({
 
 export default PriceChart;
 
-export { PriceChart }
+export { PriceChart };
