@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ElectricityPrice } from '../types';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { convertPrice } from '../utils/formatting';
 import { getPriceStats } from '../utils/price-calculations';
 import { getCurrentPrice } from '../utils/electricity';
@@ -84,7 +84,6 @@ const renderDot = (props: DotProps, options: {
 
   if (!dataKey || index === undefined) return null;
 
-  // Create unique keys using all available context
   const uniqueId = `${lineKey}-${index}-${payload?.time}`;
 
   return (
@@ -108,6 +107,10 @@ const PriceChart: React.FC<PriceChartProps> = ({
   unit,
 }) => {
   const { t } = useTranslation();
+  const [visibleLines, setVisibleLines] = useState({
+    today: true,
+    tomorrow: true
+  });
 
   if (!todayPrices.length) {
     return (
@@ -123,53 +126,70 @@ const PriceChart: React.FC<PriceChartProps> = ({
     );
   }
 
-  const data = [];
+  const chartData = useMemo(() => {
+    const data = [];
+    const currentPrice = getCurrentPrice(todayPrices);
+    const currentHour = currentPrice ? new Date(currentPrice.dateTime).getHours() : -1;
+
+    if (visibleLines.today) {
+      todayPrices.forEach(price => {
+        const hour = new Date(price.dateTime).getHours();
+        data.push({
+          time: format(parseISO(price.dateTime), 'HH:mm'),
+          today: convertPrice(price.price, unit),
+          originalDate: price.dateTime,
+          isCurrentHour: hour === currentHour,
+        });
+      });
+    }
+
+    if (visibleLines.tomorrow && tomorrowPrices.length > 0) {
+      // Only add the connecting point if both lines are visible
+      if (visibleLines.today && data.length > 0) {
+        data[data.length - 1].tomorrow = data[data.length - 1].today;
+      }
+
+      tomorrowPrices.forEach(price => {
+        data.push({
+          time: format(parseISO(price.dateTime), 'HH:mm'),
+          tomorrow: convertPrice(price.price, unit),
+          originalDate: price.dateTime,
+          isCurrentHour: false,
+        });
+      });
+    }
+
+    return data;
+  }, [todayPrices, tomorrowPrices, visibleLines, unit]);
+
   const todayStats = getPriceStats(todayPrices);
   const tomorrowStats = getPriceStats(tomorrowPrices);
-  const currentPrice = getCurrentPrice(todayPrices);
-  const currentHour = currentPrice ? new Date(currentPrice.dateTime).getHours() : -1;
 
-  todayPrices.forEach(price => {
-    const hour = new Date(price.dateTime).getHours();
-    data.push({
-      time: format(parseISO(price.dateTime), 'HH:mm'),
-      today: convertPrice(price.price, unit),
-      originalDate: price.dateTime,
-      isCurrentHour: hour === currentHour,
-    });
-  });
+  const visiblePrices = useMemo(() => {
+    const prices = [];
+    if (visibleLines.today) {
+      prices.push(...todayPrices.map(p => p.price));
+    }
+    if (visibleLines.tomorrow) {
+      prices.push(...tomorrowPrices.map(p => p.price));
+    }
+    return prices;
+  }, [todayPrices, tomorrowPrices, visibleLines]);
 
-  if (tomorrowPrices.length > 0) {
-    data[data.length - 1].tomorrow = data[data.length - 1].today;
-
-    tomorrowPrices.forEach(price => {
-      data.push({
-        time: format(parseISO(price.dateTime), 'HH:mm'),
-        tomorrow: convertPrice(price.price, unit),
-        originalDate: price.dateTime,
-        isCurrentHour: false,
-      });
-    });
-  }
-
-  // Calculate dynamic domain based on unit
-  const allPrices = [...todayPrices.map(p => p.price), ...tomorrowPrices.map(p => p.price)];
-  const minPrice = Math.min(...allPrices);
-  const maxPrice = Math.max(...allPrices);
+  const minPrice = Math.min(...visiblePrices);
+  const maxPrice = Math.max(...visiblePrices);
   
-  // Convert min/max to the selected unit and add padding
   const convertedMin = convertPrice(minPrice, unit);
   const convertedMax = convertPrice(maxPrice, unit);
   const range = convertedMax - convertedMin;
   const padding = range * 0.1;
   
-  // Round the values appropriately based on the unit
   const yMin = unit === 'kWh' 
-    ? Math.floor(convertedMin * 10000) / 10000 // Round to 4 decimal places for kWh
-    : Math.floor(convertedMin); // Round to whole numbers for MWh
+    ? Math.floor(convertedMin * 10000) / 10000
+    : Math.floor(convertedMin);
   const yMax = unit === 'kWh'
-    ? Math.ceil(convertedMax * 10000) / 10000 // Round to 4 decimal places for kWh
-    : Math.ceil(convertedMax); // Round to whole numbers for MWh
+    ? Math.ceil(convertedMax * 10000) / 10000
+    : Math.ceil(convertedMax);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length > 0) {
@@ -187,17 +207,44 @@ const PriceChart: React.FC<PriceChartProps> = ({
     return null;
   };
 
+  const toggleLine = (line: 'today' | 'tomorrow') => {
+    setVisibleLines(prev => ({
+      ...prev,
+      [line]: !prev[line]
+    }));
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold dark:text-white">
           {t('priceChart')}
         </h2>
-        <span className="text-sm font-normal text-gray-600 dark:text-gray-400">{`€/${unit}`}</span>
+        <div className="flex items-center space-x-4">
+          {tomorrowPrices.length > 0 && (
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => toggleLine('today')}
+                className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                {visibleLines.today ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                <span>{t('today')}</span>
+              </button>
+              <button
+                onClick={() => toggleLine('tomorrow')}
+                className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400"
+              >
+                {visibleLines.tomorrow ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                <span>{t('tomorrow')}</span>
+              </button>
+            </div>
+          )}
+          <span className="text-sm font-normal text-gray-600 dark:text-gray-400">{`€/${unit}`}</span>
+        </div>
       </div>
       <div className="h-[250px] xs:h-[300px] sm:h-[400px] -mx-4 sm:mx-0">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
             <CartesianGrid 
               strokeDasharray="1 10"
               stroke="#6B7280"
@@ -218,22 +265,23 @@ const PriceChart: React.FC<PriceChartProps> = ({
               domain={[yMin - padding, yMax + padding]}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend iconType="circle" />
-            <Line
-              type="monotone"
-              dataKey="today"
-              name={t('today')}
-              stroke="#3B82F6"
-              strokeWidth={2}
-              dot={(props) => renderDot(props as DotProps, { 
-                todayStats,
-                unit,
-                lineKey: 'today'
-              })}
-              isAnimationActive={false}
-              activeDot={{ r: 6 }}
-            />
-            {tomorrowPrices.length > 0 && (
+            {visibleLines.today && (
+              <Line
+                type="monotone"
+                dataKey="today"
+                name={t('today')}
+                stroke="#3B82F6"
+                strokeWidth={2}
+                dot={(props) => renderDot(props as DotProps, { 
+                  todayStats,
+                  unit,
+                  lineKey: 'today'
+                })}
+                isAnimationActive={false}
+                activeDot={{ r: 6 }}
+              />
+            )}
+            {tomorrowPrices.length > 0 && visibleLines.tomorrow && (
               <Line
                 type="monotone"
                 dataKey="tomorrow"

@@ -19,9 +19,21 @@ export default defineConfig({
           {
             src: 'favicon.svg',
             type: 'image/svg+xml',
-            sizes: 'any'
+            sizes: 'any',
+            purpose: 'any'
+          },
+          {
+            src: 'favicon.svg',
+            type: 'image/svg+xml',
+            sizes: 'any',
+            purpose: 'maskable'
           }
-        ]
+        ],
+        start_url: '/',
+        scope: '/'
+      },
+      devOptions: {
+        enabled: true
       }
     })
   ],
