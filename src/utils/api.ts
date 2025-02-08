@@ -1,27 +1,29 @@
 import { format } from 'date-fns';
-import { ElectricityPriceResponse } from '../types';
-
-const BASE_URL = import.meta.env.DEV 
-  ? '/api/elia'
-  : 'https://griddata.elia.be';
+import { ElectricityData, ElectricityPriceResponse } from '../types';
 
 export const fetchElectricityPrices = async (date: Date): Promise<ElectricityPriceResponse[]> => {
   const formattedDate = format(date, 'yyyy-MM-dd');
-  const response = await fetch(
-    `${BASE_URL}/eliabecontrols.prod/interface/Interconnections/daily/auctionresultsqh/${formattedDate}`,
-    {
-      headers: {
-        Accept: 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        Pragma: 'no-cache',
-        Expires: '0'
-      }
-    }
-  );
+  const targetUrl = `https://griddata.elia.be/eliabecontrols.prod/interface/Interconnections/daily/auctionresultsqh/${formattedDate}`;
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
+  const response = await fetch(proxyUrl);
   
   if (!response.ok) {
     throw new Error(`Failed to fetch prices for ${formattedDate}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  
+  if (!data.contents) {
+    throw new Error('No data received from the server');
+  }
+
+  try {
+    // The API returns the data wrapped in a 'contents' property as a string
+    const parsedContents = JSON.parse(data.contents);
+    return Array.isArray(parsedContents) ? parsedContents : [];
+  } catch (error) {
+    console.error('Failed to parse response:', error);
+    throw new Error('Invalid data format received from the server');
+  }
 };

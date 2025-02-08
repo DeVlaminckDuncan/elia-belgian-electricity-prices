@@ -25,15 +25,6 @@ export default defineConfig({
       }
     })
   ],
-  server: {
-    proxy: {
-      '/api/elia': {
-        target: 'https://griddata.elia.be',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/elia/, ''),
-      }
-    }
-  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   }
