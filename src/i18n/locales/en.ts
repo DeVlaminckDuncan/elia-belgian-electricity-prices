@@ -28,5 +28,7 @@ export default {
     todayMax: "Today's Max",
     tomorrowMin: "Tomorrow's Min",
     tomorrowMax: "Tomorrow's Max",
+    lowestToday: "Lowest Today",
+    highestToday: "Highest Today",
   },
 };

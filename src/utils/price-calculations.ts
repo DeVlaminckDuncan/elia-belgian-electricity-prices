@@ -16,7 +16,7 @@ export const calculatePriceDiffWithPrevious = (
 };
 
 export const getPriceStats = (prices: ElectricityPrice[]) => {
-  if (!prices.length) return null;
+  if (!prices?.length) return null;
 
   const min = prices.reduce((a, b) => a.price < b.price ? a : b);
   const max = prices.reduce((a, b) => a.price > b.price ? a : b);

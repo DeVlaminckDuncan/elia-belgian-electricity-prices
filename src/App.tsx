@@ -105,11 +105,13 @@ function App() {
           <CurrentPrice
             currentPrice={getCurrentPrice(todayPrices)}
             nextPrice={getNextPrice(todayPrices, tomorrowPrices)}
+            todayPrices={todayPrices}
             unit={unit}
           />
         </div>
 
         <PriceChart
+          yesterdayPrices={yesterdayPrices}
           todayPrices={todayPrices}
           tomorrowPrices={tomorrowPrices}
           unit={unit}
@@ -131,13 +133,14 @@ function App() {
           />
           <PriceTable 
             prices={yesterdayPrices} 
-            title={t('yesterdayPrices')} 
+            title={t('yesterdayPrices')}
+            highlight="purple"
             unit={unit}
           />
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default App;

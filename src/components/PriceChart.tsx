@@ -9,6 +9,7 @@ import { getPriceStats } from '../utils/price-calculations';
 import { getCurrentPrice } from '../utils/electricity';
 
 interface PriceChartProps {
+  yesterdayPrices: ElectricityPrice[];
   todayPrices: ElectricityPrice[];
   tomorrowPrices: ElectricityPrice[];
   unit: 'MWh' | 'kWh';
@@ -22,6 +23,7 @@ interface DotProps {
   payload?: {
     isCurrentHour: boolean;
     time: string;
+    yesterday?: number;
     today?: number;
     tomorrow?: number;
   };
@@ -43,23 +45,26 @@ const CustomDot: React.FC<DotProps> = ({ cx, cy, payload }) => {
 };
 
 interface MinMaxDotProps extends DotProps {
+  yesterdayStats?: { min: ElectricityPrice; max: ElectricityPrice };
   todayStats?: { min: ElectricityPrice; max: ElectricityPrice };
   tomorrowStats?: { min: ElectricityPrice; max: ElectricityPrice };
   unit: 'MWh' | 'kWh';
   lineKey: string;
 }
 
-const MinMaxDot: React.FC<MinMaxDotProps> = ({ cx, cy, payload, todayStats, tomorrowStats, unit, lineKey }) => {
+const MinMaxDot: React.FC<MinMaxDotProps> = ({ cx, cy, payload, yesterdayStats, todayStats, tomorrowStats, unit, lineKey }) => {
   if (!cx || !cy || !payload || !unit) return null;
 
+  const isMinYesterday = yesterdayStats && payload.yesterday === convertPrice(yesterdayStats.min.price, unit);
+  const isMaxYesterday = yesterdayStats && payload.yesterday === convertPrice(yesterdayStats.max.price, unit);
   const isMinToday = todayStats && payload.today === convertPrice(todayStats.min.price, unit);
   const isMaxToday = todayStats && payload.today === convertPrice(todayStats.max.price, unit);
   const isMinTomorrow = tomorrowStats && payload.tomorrow === convertPrice(tomorrowStats.min.price, unit);
   const isMaxTomorrow = tomorrowStats && payload.tomorrow === convertPrice(tomorrowStats.max.price, unit);
 
-  if (!isMinToday && !isMaxToday && !isMinTomorrow && !isMaxTomorrow) return null;
+  if (!isMinYesterday && !isMaxYesterday && !isMinToday && !isMaxToday && !isMinTomorrow && !isMaxTomorrow) return null;
 
-  const color = isMinToday || isMinTomorrow ? '#22C55E' : '#EF4444';
+  const color = isMinYesterday || isMinToday || isMinTomorrow ? '#22C55E' : '#EF4444';
   
   return (
     <circle 
@@ -74,12 +79,13 @@ const MinMaxDot: React.FC<MinMaxDotProps> = ({ cx, cy, payload, todayStats, tomo
 };
 
 const renderDot = (props: DotProps, options: { 
+  yesterdayStats?: { min: ElectricityPrice; max: ElectricityPrice },
   todayStats?: { min: ElectricityPrice; max: ElectricityPrice },
   tomorrowStats?: { min: ElectricityPrice; max: ElectricityPrice },
   unit: 'MWh' | 'kWh',
   lineKey: string
 }) => {
-  const { todayStats, tomorrowStats, unit, lineKey } = options;
+  const { yesterdayStats, todayStats, tomorrowStats, unit, lineKey } = options;
   const { dataKey, index, payload } = props;
 
   if (!dataKey || index === undefined) return null;
@@ -92,6 +98,7 @@ const renderDot = (props: DotProps, options: {
       <MinMaxDot 
         {...props}
         key={`minmax-${uniqueId}`}
+        yesterdayStats={yesterdayStats}
         todayStats={todayStats}
         tomorrowStats={tomorrowStats}
         unit={unit}
@@ -102,12 +109,14 @@ const renderDot = (props: DotProps, options: {
 };
 
 const PriceChart: React.FC<PriceChartProps> = ({
+  yesterdayPrices,
   todayPrices,
   tomorrowPrices,
   unit,
 }) => {
   const { t } = useTranslation();
   const [visibleLines, setVisibleLines] = useState({
+    yesterday: false,
     today: true,
     tomorrow: true
   });
@@ -130,6 +139,24 @@ const PriceChart: React.FC<PriceChartProps> = ({
     const data = [];
     const currentPrice = getCurrentPrice(todayPrices);
     const currentHour = currentPrice ? new Date(currentPrice.dateTime).getHours() : -1;
+
+    if (visibleLines.yesterday) {
+      yesterdayPrices.forEach(price => {
+        const hour = new Date(price.dateTime).getHours();
+        data.push({
+          time: format(parseISO(price.dateTime), 'HH:mm'),
+          yesterday: convertPrice(price.price, unit),
+          originalDate: price.dateTime,
+          isCurrentHour: false,
+        });
+      });
+
+      // Add connecting point if today is visible
+      if (visibleLines.today && data.length > 0 && todayPrices.length > 0) {
+        const lastYesterdayPrice = yesterdayPrices[yesterdayPrices.length - 1];
+        data[data.length - 1].today = convertPrice(lastYesterdayPrice.price, unit);
+      }
+    }
 
     if (visibleLines.today) {
       todayPrices.forEach(price => {
@@ -160,13 +187,17 @@ const PriceChart: React.FC<PriceChartProps> = ({
     }
 
     return data;
-  }, [todayPrices, tomorrowPrices, visibleLines, unit]);
+  }, [yesterdayPrices, todayPrices, tomorrowPrices, visibleLines, unit]);
 
+  const yesterdayStats = getPriceStats(yesterdayPrices);
   const todayStats = getPriceStats(todayPrices);
   const tomorrowStats = getPriceStats(tomorrowPrices);
 
   const visiblePrices = useMemo(() => {
     const prices = [];
+    if (visibleLines.yesterday) {
+      prices.push(...yesterdayPrices.map(p => p.price));
+    }
     if (visibleLines.today) {
       prices.push(...todayPrices.map(p => p.price));
     }
@@ -174,7 +205,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
       prices.push(...tomorrowPrices.map(p => p.price));
     }
     return prices;
-  }, [todayPrices, tomorrowPrices, visibleLines]);
+  }, [yesterdayPrices, todayPrices, tomorrowPrices, visibleLines]);
 
   const minPrice = Math.min(...visiblePrices);
   const maxPrice = Math.max(...visiblePrices);
@@ -207,7 +238,7 @@ const PriceChart: React.FC<PriceChartProps> = ({
     return null;
   };
 
-  const toggleLine = (line: 'today' | 'tomorrow') => {
+  const toggleLine = (line: 'yesterday' | 'today' | 'tomorrow') => {
     setVisibleLines(prev => ({
       ...prev,
       [line]: !prev[line]
@@ -221,15 +252,22 @@ const PriceChart: React.FC<PriceChartProps> = ({
           {t('priceChart')}
         </h2>
         <div className="flex items-center space-x-4">
-          {tomorrowPrices.length > 0 && (
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => toggleLine('today')}
-                className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
-              >
-                {visibleLines.today ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                <span>{t('today')}</span>
-              </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => toggleLine('yesterday')}
+              className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400"
+            >
+              {visibleLines.yesterday ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              <span>{t('yesterday')}</span>
+            </button>
+            <button
+              onClick={() => toggleLine('today')}
+              className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+            >
+              {visibleLines.today ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              <span>{t('today')}</span>
+            </button>
+            {tomorrowPrices.length > 0 && (
               <button
                 onClick={() => toggleLine('tomorrow')}
                 className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400"
@@ -237,8 +275,8 @@ const PriceChart: React.FC<PriceChartProps> = ({
                 {visibleLines.tomorrow ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 <span>{t('tomorrow')}</span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
           <span className="text-sm font-normal text-gray-600 dark:text-gray-400">{`€/${unit}`}</span>
         </div>
       </div>
@@ -265,6 +303,22 @@ const PriceChart: React.FC<PriceChartProps> = ({
               domain={[yMin - padding, yMax + padding]}
             />
             <Tooltip content={<CustomTooltip />} />
+            {visibleLines.yesterday && (
+              <Line
+                type="monotone"
+                dataKey="yesterday"
+                name={t('yesterday')}
+                stroke="#9333EA"
+                strokeWidth={2}
+                dot={(props) => renderDot(props as DotProps, { 
+                  yesterdayStats,
+                  unit,
+                  lineKey: 'yesterday'
+                })}
+                isAnimationActive={false}
+                activeDot={{ r: 6 }}
+              />
+            )}
             {visibleLines.today && (
               <Line
                 type="monotone"

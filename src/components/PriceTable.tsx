@@ -10,7 +10,7 @@ interface PriceTableProps {
   prices: ElectricityPrice[];
   title: string;
   currentDateTime?: string;
-  highlight?: boolean;
+  highlight?: boolean | 'green' | 'purple';
   unit: 'MWh' | 'kWh';
 }
 
@@ -36,14 +36,36 @@ export const PriceTable: React.FC<PriceTableProps> = ({
     );
   }
 
+  const getHighlightColor = () => {
+    switch (highlight) {
+      case true:
+        return 'ring-2 ring-blue-500 dark:ring-blue-400';
+      case 'green':
+        return 'ring-2 ring-green-500 dark:ring-green-400';
+      case 'purple':
+        return 'ring-2 ring-purple-500 dark:ring-purple-400';
+      default:
+        return '';
+    }
+  };
+
+  const getTitleColor = () => {
+    switch (highlight) {
+      case true:
+        return 'text-blue-600 dark:text-blue-400';
+      case 'green':
+        return 'text-green-600 dark:text-green-400';
+      case 'purple':
+        return 'text-purple-600 dark:text-purple-400';
+      default:
+        return 'dark:text-white';
+    }
+  };
+
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 ${
-      highlight === true ? 'ring-2 ring-blue-500 dark:ring-blue-400' : highlight === 'green' ? 'ring-2 ring-green-500 dark:ring-green-400' : ''
-    }`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 ${getHighlightColor()}`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className={`text-lg font-semibold ${
-          highlight === true ? 'text-blue-600 dark:text-blue-400' : highlight === 'green' ? 'text-green-600 dark:text-green-400' : 'dark:text-white'
-        }`}>{title}</h2>
+        <h2 className={`text-lg font-semibold ${getTitleColor()}`}>{title}</h2>
         <div className="text-sm text-gray-600 dark:text-gray-400">{`€/${unit}`}</div>
       </div>
       <div className="overflow-x-auto -mx-4 sm:mx-0">
